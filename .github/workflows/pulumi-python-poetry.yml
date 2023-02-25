@@ -65,7 +65,7 @@ jobs:
           source ${{ inputs.python_virtualenv }}/bin/activate
           poetry install
 
-      - uses: pulumi/actions@v3
+      - uses: pulumi/actions@v4
         with:
           command: ${{ inputs.pulumi_command }}
           stack-name: ${{ inputs.pulumi_stack_name }}
