@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       python-version:
-        description: 'Python version'
+        description: Python Version
         required: true
         type: string
 
