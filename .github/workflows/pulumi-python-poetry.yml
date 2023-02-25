@@ -3,12 +3,8 @@ name: Pulumi Python
 on:
   workflow_call:
     inputs:
-      aws_account_id:
-        description: AWS Account ID
-        required: true
-        type: string
-      aws_region:
-        description: AWS Region
+      github_env:
+        description: GitHub Environment
         required: true
         type: string
       python_version:
@@ -40,7 +36,7 @@ jobs:
     name: Build and Preview Nonprod
     runs-on: ubuntu-latest
     environment:
-      name: nonprod
+      name: ${{ inputs.github_env }}
     permissions:
       id-token: write
       contents: read
@@ -51,9 +47,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::${{ inputs.aws_account_id }}:role/GithubActionsDeploymentRole
+          role-to-assume: arn:aws:iam::${{ vars.aws_account_id }}:role/GithubActionsDeploymentRole
           role-session-name: pulumi-${{ github.run_id }}
-          aws-region: ${{ inputs.aws_region }}
+          aws-region: ${{ vars.aws_region }}
 
       - name: Install Poetry
         run: curl -sSL https://install.python-poetry.org | python3 -
