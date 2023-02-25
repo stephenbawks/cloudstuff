@@ -1,0 +1,69 @@
+name: Pulumi Python
+
+on:
+  workflow_call:
+    inputs:
+      python_version:
+        description: Python Version
+        required: true
+        type: string
+      python_virtualenv:
+        description: Python Virtual Environment
+        required: false
+        type: string
+        default: .venv
+      pulumi_command:
+        description: Pulumi Command
+        required: false
+        type: string
+        default: preview
+      pulumi_stack_name:
+        description: Pulumi Stack Name
+        required: true
+        type: string
+
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build_nonprod:
+    name: Build and Preview Nonprod
+    runs-on: ubuntu-latest
+    environment:
+      name: nonprod
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ inputs.AWS_ACCOUNT_ID }}:role/GithubActionsDeploymentRole
+          role-session-name: pulumi-${{ github.run_id }}
+          aws-region: ${{ inputs.AWS_REGION }}
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Setup Python ✨
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Installing dependencies 📦️
+        run: |
+          python3 -m venv ${{ inputs.python_virtualenv }}
+          source ${{ inputs.python_virtualenv }}/bin/activate
+          poetry install
+
+      - uses: pulumi/actions@v3
+        with:
+          command: ${{ inputs.pulumi_command }}
+          stack-name: ${{ inputs.pulumi_stack_name }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
