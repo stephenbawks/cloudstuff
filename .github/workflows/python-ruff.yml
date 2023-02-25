@@ -1,0 +1,42 @@
+name: Python Ruff
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: 'Python version'
+        required: true
+        type: string
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: Python Lint
+    runs-on: ubuntu-latest
+    environment:
+      name: nonprod
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Setup Python ✨
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Check for misspelled words
+        uses: reviewdog/action-misspell@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          locale: US
+
+      - name: Python Lint - Ruff
+        run: |
+          pip install ruff
+          ruff check .
