@@ -25,6 +25,10 @@ on:
         description: Pulumi Stack Name
         required: true
         type: string
+      pulumi_access_token:
+        description: Pulumi Access Token
+        required: true
+        type: string
 
 
 defaults:
@@ -58,6 +62,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ inputs.python_version }}
+          cache: poetry
 
       - name: Installing dependencies 📦️
         run: |
@@ -70,4 +75,5 @@ jobs:
           command: ${{ inputs.pulumi_command }}
           stack-name: ${{ inputs.pulumi_stack_name }}
         env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          # PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          PULUMI_ACCESS_TOKEN: ${{ inputs.pulumi_access_token }}
