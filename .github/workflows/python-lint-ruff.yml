@@ -7,6 +7,11 @@ on:
         description: Python Version
         required: true
         type: string
+      ruff-path:
+        description: Path that ruff will use to lint against
+        required: true
+        type: string
+        default: "."
 
 defaults:
   run:
@@ -39,4 +44,4 @@ jobs:
       - name: Python Lint - Ruff
         run: |
           pip install ruff
-          ruff check .
+          ruff check ${{ inputs.ruff-path }}
